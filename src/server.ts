@@ -3,14 +3,9 @@ import swaggerDocument from "./swagger/swagger.json";
 
 import express from "express";
 
-import spotMarketCreateEvents from "./routes/spotMarketCreateEvents";
 import spotOrders from "./routes/spotOrders";
 import spotOrderChangeEvents from "./routes/spotOrderChangeEvents";
 import spotTradeEvents from "./routes/spotTradeEvents";
-import perpMarkets from "./routes/perpMarkets";
-import perpPositions from "./routes/perpPositions";
-import perpOrders from "./routes/perpOrders";
-import perpTradeEvents from "./routes/perpTradeEvents";
 import {PORT, PRIVATE_KEY, PROXY_ID, START_BLOCK} from "./config";
 import {FuelNetwork} from "./sdk/blockchain";
 import SystemSettings from "./models/settings";
@@ -38,20 +33,9 @@ app.use(function (_: any, res: any, next: any) {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/spot/statistics", spotStatistics);
-app.use("/spot/marketCreateEvents", spotMarketCreateEvents);
 app.use("/spot/orders", spotOrders);
 app.use("/spot/orderChangeEvents", spotOrderChangeEvents);
 app.use("/spot/tradeEvents", spotTradeEvents);
-
-app.use("/perp/markets", perpMarkets);
-app.use("/perp/positions", perpPositions);
-app.use("/perp/tradeEvents", () => perpTradeEvents);
-app.use("/perp/orders", perpOrders);
-//todo
-// app.use("/perp/marketEvents", () => perpMarketEvents);
-// app.use("/perp/accountBalanceChangeEvents", () => perpAccountBalanceChangeEvents);
-// app.use("/perp/orderEvents", () => perpOrderEvents);
-
 
 type TIndexerSettings = { startBlock: number; };
 
@@ -152,8 +136,7 @@ class Indexer {
             return;
         }
 
-        await handleProxyReceipts(receiptsResult.receipts.filter(({contract_id}: any) => contract_id == PROXY_ID), this.proxyAbi!)
-
+        await handleProxyReceipts(receiptsResult.receipts.filter(({contract_id}: any) => contract_id == PROXY_ID), this.proxyAbi!, this.fuelNetwork.getBalance);
         await this.updateSettings(receiptsResult.nextBlock);
         await sleep(100);
     };

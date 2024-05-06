@@ -13,6 +13,7 @@ interface PerpOrderParams {
   trader: string;
 }
 
+
 export class PerpOrder {
   readonly baseToken: Token;
   readonly id: string;

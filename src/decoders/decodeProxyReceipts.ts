@@ -1,8 +1,5 @@
 import {Contract, getDecodedLogs, TransactionResultReceipt} from "fuels";
 import isEvent from "../utils/isEvent";
-import BN from "../utils/BN";
-import tai64ToDate from "../utils/tai64ToDate";
-
 
 export function decodeProxyReceipts(receipts: TransactionResultReceipt[], abi: Contract) {
     try {
@@ -22,9 +19,7 @@ export function decodeProxyReceipts(receipts: TransactionResultReceipt[], abi: C
             }
 
         })
-        return decodedLogs
-            .filter(e => e !== undefined)
-        // .sort((a: any, b: any) => new BN(a.timestamp).gt(b.timestamp) ? 1 : -1)
+        return decodedLogs.filter(e => e !== undefined);
     } catch (e) {
         console.error(e, receipts)
         return []
