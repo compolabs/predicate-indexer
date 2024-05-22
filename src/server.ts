@@ -16,6 +16,8 @@ import sequelize from "./db";
 import spotStatistics from "./routes/spotStatistics";
 import {ProxyContractAbi, ProxyContractAbi__factory} from "./sdk/blockchain/fuel/types/proxy";
 import {handleProxyReceipts} from "./handlers/handleProxyReceipts";
+import fetchOutputsFromEnvio from "./utils/fetchOutputsFromEnvio";
+import { handleProxyOutputs } from "./handlers/handleProxyOutputs";
 
 const app = express();
 
@@ -130,15 +132,26 @@ class Indexer {
         const syncTime = formatCountdown(secLeft);
         this.iterationCounter === 0 &&
         console.log(`♻️ Processing: ${receiptsResult?.nextBlock} / ${receiptsResult?.archiveHeight} | ${secLeft > 1 ? `(~ ${syncTime} left)` : "synchronized"}`);
-
+        
         if (receiptsResult == null || receiptsResult.receipts.length == 0) {
             await this.updateSettings(receiptsResult?.nextBlock ?? toBlock);
-            return;
+            // return;
+        } else {
+            await handleProxyReceipts(receiptsResult.receipts.filter(({contract_id}: any) => contract_id == PROXY_ID), this.proxyAbi!);
+            await this.updateSettings(receiptsResult.nextBlock);
+            await sleep(100);
         }
 
-        await handleProxyReceipts(receiptsResult.receipts.filter(({contract_id}: any) => contract_id == PROXY_ID), this.proxyAbi!, this.fuelNetwork.getBalance);
-        await this.updateSettings(receiptsResult.nextBlock);
-        await sleep(100);
+        const inputsResult = await fetchOutputsFromEnvio(fromBlock, toBlock);
+
+        if (inputsResult == null || inputsResult.outputs.length == 0) {
+            await this.updateSettings(inputsResult?.nextBlock ?? toBlock);
+            // return;
+        } else {
+            await handleProxyOutputs(inputsResult.outputs);
+            await this.updateSettings(inputsResult.nextBlock);
+            await sleep(100);
+        }
     };
 
 }

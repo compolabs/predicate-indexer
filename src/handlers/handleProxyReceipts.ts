@@ -3,12 +3,10 @@ import CreateOrderEvent from "../models/createOrderEvent";
 import isEvent from "../utils/isEvent";
 import {Contract, TransactionResultReceipt} from "fuels";
 import {decodeProxyReceipts} from "../decoders/decodeProxyReceipts";
-import { BlockchainNetworkFactory } from "../sdk/blockchain/BlockchainNetworkFactory";
 
 export async function handleProxyReceipts(
   receipts: TransactionResultReceipt[],
   abi: Contract,
-  getBalance: any,
 ) {
     const decodedEvents = decodeProxyReceipts(receipts, abi);
 
@@ -26,17 +24,10 @@ export async function handleProxyReceipts(
             });
 
             if (created) {
-                // const bcNetwork = BlockchainNetworkFactory.getInstance().currentInstance!;
-                //
-                // const base_balance = await bcNetwork.getBalance(event.predicate_root, event.base_asset);
-                // await order.set('base_amount', base_balance).save();
-                // const quote_balance = await bcNetwork.getBalance(event.predicate_root, event.quote_asset);
-                // await order.set('quote_amount', quote_balance).save();
-
-                const base_balance = await getBalance(event.predicate_root, event.base_asset);
-                await order.set('base_amount', base_balance).save();
-                const quote_balance = await getBalance(event.predicate_root, event.quote_asset);
-                await order.set('quote_amount', quote_balance).save();
+                // const baseBalance = await abi.provider.getBalance(event.predicate_root, event.base_asset);
+                // await order.set('base_amount', baseBalance).save();
+                // const quoteBalance = await abi.provider.getBalance(event.predicate_root, event.quote_asset);
+                // await order.set('quote_amount', quoteBalance).save();
             }
         }
     }

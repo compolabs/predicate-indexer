@@ -19,7 +19,7 @@ export default async function fetchReceiptsFromEnvio(fromBlock: number, toBlock:
             {"root_contract_id": contracts, "receipt_type": [6]}
         ],
         "field_selection": {
-            "transaction": ["id", "status"],
+            "transaction": ["id", "status", "time"],
             "receipt": ["tx_id", "receipt_type", "contract_id", "ra", "rb", "ptr", "len", "digest", "pc", "is", "data", "root_contract_id"]
         }
     }

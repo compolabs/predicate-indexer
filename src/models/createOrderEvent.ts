@@ -10,6 +10,7 @@ const CreateOrderEvent = sequelize.define('createOrderEvent', {
     base_amount: { type: Sequelize.STRING },
     order_type: { type: Sequelize.STRING },
     min_fulfill_base_amount: { type: Sequelize.STRING },
+    timestamp: { type: Sequelize.DATE },
 });
 
 export default CreateOrderEvent;
